@@ -3,42 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEXUS AI — Memória Inteligente</title>
+<title>NEXUS AI</title>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;700&display=swap');
   :root { --bg: #080A0F; --bg2: #0D1018; --surface: #181D28; --border: #252D40; --accent: #4F8EF7; --text: #E8ECFF; --text2: #8892AA; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; height: 100dvh; overflow: hidden; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+  body { background: var(--bg); color: var(--text); height: 100dvh; overflow: hidden; }
   #app { display: flex; flex-direction: column; height: 100%; }
   
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg2); }
-  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--accent); letter-spacing: -1px; }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; color: var(--accent); }
 
-  /* Chat IA */
   .ai-wrap { padding: 15px 20px; background: linear-gradient(180deg, var(--bg2), var(--bg)); border-bottom: 1px solid var(--border); }
   .ai-input-group { display: flex; gap: 8px; background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.3); border-radius: 12px; padding: 10px 15px; align-items: center; }
   .ai-input-group input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 14px; }
-  .ai-answer { margin-top: 12px; font-size: 13px; line-height: 1.5; color: #1EDCA5; background: rgba(30,220,165,0.05); padding: 12px; border-radius: 10px; border-left: 3px solid #1EDCA5; display: none; }
+  .ai-answer { margin-top: 12px; font-size: 13px; color: #1EDCA5; background: rgba(30,220,165,0.05); padding: 12px; border-radius: 10px; border-left: 3px solid #1EDCA5; display: none; }
 
-  /* Busca */
+  /* Busca com Lupa à Direita */
   .search-area { padding: 10px 20px; }
-  .search-box { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 15px; }
-  .search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text2); font-size: 14px; }
+  .search-box { display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 15px; }
+  .search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-size: 14px; }
+  .search-box i { color: var(--text2); font-size: 18px; }
 
   .main { flex: 1; overflow-y: auto; padding: 10px 20px 100px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-bottom: 15px; }
   .card strong { color: var(--accent); display: block; font-size: 15px; margin-bottom: 5px; }
-  .card p { font-size: 13px; color: var(--text2); line-height: 1.5; }
-  .card img { width: 100%; border-radius: 10px; margin-top: 10px; }
-  .file-tag { display: inline-flex; align-items: center; gap: 5px; background: #000; padding: 5px 10px; border-radius: 6px; font-size: 11px; color: #7B5CF5; margin-top: 10px; border: 1px solid #2E3A52; }
+  .card img { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
+  .file-tag { display: inline-flex; align-items: center; gap: 5px; background: #000; padding: 5px 10px; border-radius: 6px; font-size: 11px; color: #7B5CF5; margin-top: 10px; }
 
-  .btn-plus { background: none; border: none; color: var(--accent); font-size: 30px; cursor: pointer; }
   .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.9); display: none; align-items: flex-end; }
   .modal-overlay.open { display: flex; }
   .modal { width: 100%; background: var(--bg2); border-radius: 25px 25px 0 0; padding: 25px; }
   .form-ctrl { width: 100%; background: var(--surface); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; margin-bottom: 10px; outline: none; }
-  .btn-save { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 12px; color: #fff; font-weight: bold; font-size: 16px; }
+  .btn-save { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 12px; color: #fff; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -48,21 +46,24 @@
     <div class="logo">NEXUS AI</div>
     <div style="display:flex; gap:12px; align-items:center">
       <button onclick="setKey()" style="font-size:10px; border:1px solid var(--border); background:none; color:var(--text2); padding:4px 8px; border-radius:5px">Config IA</button>
-      <button class="btn-plus" onclick="openM()"><i class="ph ph-plus-circle"></i></button>
+      <button onclick="openM()" style="background:none; border:none; color:var(--accent); font-size:30px"><i class="ph ph-plus-circle"></i></button>
     </div>
   </header>
 
   <div class="ai-wrap">
     <div class="ai-input-group">
       <i class="ph ph-sparkle" style="color:var(--accent)"></i>
-      <input type="text" id="aiIn" placeholder="Interpretar dados..." onkeypress="if(event.key=='Enter') talk()">
+      <input type="text" id="aiIn" placeholder="Comando de voz ou texto..." onkeypress="if(event.key=='Enter') talk()">
       <button onclick="talk()" style="background:none; border:none; color:var(--accent)"><i class="ph ph-paper-plane-right"></i></button>
     </div>
     <div id="aiOut" class="ai-answer"></div>
   </div>
 
   <div class="search-area">
-    <div class="search-box"><i class="ph ph-magnifying-glass"></i><input type="text" id="q" placeholder="Varredura manual..." onkeyup="render()"></div>
+    <div class="search-box">
+      <input type="text" id="q" placeholder="Buscar em memórias..." onkeyup="render()">
+      <i class="ph ph-magnifying-glass"></i>
+    </div>
   </div>
 
   <main class="main" id="list"></main>
@@ -71,7 +72,7 @@
 <div class="modal-overlay" id="modal" onclick="if(event.target==this) closeM()">
   <div class="modal">
     <input type="text" id="t" class="form-ctrl" placeholder="Título">
-    <textarea id="b" class="form-ctrl" rows="3" placeholder="Nota ou descrição..."></textarea>
+    <textarea id="b" class="form-ctrl" rows="3" placeholder="Nota..."></textarea>
     <input type="file" id="f" style="display:none" onchange="hF(this)">
     <label for="f" style="display:block; padding:15px; border:2px dashed var(--border); text-align:center; border-radius:10px; margin-bottom:15px; color:var(--text2)">
       <i class="ph ph-file-arrow-up"></i> <span id="fn">Anexar Arquivo</span>
@@ -81,7 +82,9 @@
 </div>
 
 <script>
-  let db = JSON.parse(localStorage.getItem('nexus_ai_v1')) || [];
+  // Chave de banco unificada para não perder dados ao sair
+  const DB_KEY = 'nexus_persistent_v1';
+  let db = JSON.parse(localStorage.getItem(DB_KEY)) || [];
   let k = localStorage.getItem('n_key') || '';
   let cF = null, cN = null;
 
@@ -90,21 +93,17 @@
   async function talk() {
     const prompt = document.getElementById('aiIn').value;
     const out = document.getElementById('aiOut');
-    if(!k) return alert("Clique em Config IA e cole sua chave!");
-    if(!prompt) return;
-
-    out.style.display = 'block'; out.innerText = "Analisando sua base de dados...";
-    const context = db.map(m => `MEMÓRIA: ${m.t}. DETALHE: ${m.b}`).join('\n');
-
+    if(!k) return alert("Configure a IA no topo!");
+    out.style.display = 'block'; out.innerText = "Nexus analisando...";
+    const context = db.map(m => `MEMÓRIA: ${m.t}. NOTA: ${m.b}`).join('\n');
     try {
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${k}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: `Você é o NEXUS, o cérebro digital de Edson. Com base nestes dados:\n${context}\n\nResponda: ${prompt}` }] }] })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: `Você é o NEXUS, assistente de Edson. Responda baseado nisso:\n${context}\n\nPergunta: ${prompt}` }] }] })
       });
       const d = await r.json();
       out.innerText = d.candidates[0].content.parts[0].text;
-    } catch(e) { out.innerText = "Erro na varredura. Verifique a chave."; }
+    } catch(e) { out.innerText = "Erro na IA."; }
   }
 
   function hF(i) {
@@ -116,7 +115,7 @@
   function save() {
     const t = document.getElementById('t').value; if(!t) return;
     db.push({ id: Date.now(), t, b: document.getElementById('b').value, f: cF, fn: cN, isI: cF && cF.startsWith('data:image') });
-    localStorage.setItem('nexus_ai_v1', JSON.stringify(db));
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
     closeM(); render();
     document.getElementById('t').value=''; document.getElementById('b').value=''; cF=null; document.getElementById('fn').innerText="Anexar Arquivo";
   }
@@ -126,14 +125,14 @@
     const l = document.getElementById('list'); l.innerHTML = '';
     db.filter(m => m.t.toLowerCase().includes(q) || (m.b && m.b.toLowerCase().includes(q))).reverse().forEach(m => {
       const d = document.createElement('div'); d.className = 'card';
-      d.innerHTML = `<strong>${m.t}</strong><p>${m.b}</p>
-      ${m.isI ? `<img src="${m.f}">` : (m.f ? `<div class="file-tag"><i class="ph ph-file"></i> ${m.fn}</div>` : '')}
-      <button onclick="del(${m.id})" style="color:var(--danger); background:none; border:none; font-size:10px; margin-top:10px; font-weight:bold">APAGAR</button>`;
+      d.innerHTML = `<strong>${m.t}</strong><p style="font-size:13px; color:var(--text2)">${m.b}</p>
+      ${m.isI ? `<img src="${m.f}">` : (m.f ? `<div class="file-tag">${m.fn}</div>` : '')}
+      <div style="text-align:right"><button onclick="del(${m.id})" style="background:none; border:none; color:#F75F5F; font-size:10px; margin-top:10px">APAGAR</button></div>`;
       l.appendChild(d);
     });
   }
 
-  function del(id) { if(confirm("Apagar?")) { db = db.filter(x => x.id !== id); localStorage.setItem('nexus_ai_v1', JSON.stringify(db)); render(); } }
+  function del(id) { if(confirm("Apagar?")) { db = db.filter(x => x.id !== id); localStorage.setItem(DB_KEY, JSON.stringify(db)); render(); } }
   function openM() { document.getElementById('modal').classList.add('open'); }
   function closeM() { document.getElementById('modal').classList.remove('open'); }
   render();
