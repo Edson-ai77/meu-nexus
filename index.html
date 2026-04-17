@@ -3,187 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEXUS PRO — Segurança Total</title>
+<title>NEXUS CORE v2.0</title>
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;700&family=Space+Mono&display=swap');
-  :root { --bg: #05070A; --bg2: #0A0D14; --surface: #121620; --border: #1F2533; --accent: #4F8EF7; --text: #E8ECFF; --danger: #F75F5F; }
+  :root { --bg: #040508; --bg2: #080A0F; --surface: #11141D; --border: #1F2533; --accent: #4F8EF7; --text: #E8ECFF; --text2: #8892AA; --success: #1EDCA5; --danger: #F75F5F; }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
   body { background: var(--bg); color: var(--text); height: 100dvh; overflow: hidden; }
 
-  /* TELA DE BLOQUEIO */
-  #lock-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; transition: 0.5s; }
-  .lock-box { width: 100%; max-width: 300px; text-align: center; }
-  .pass-input { width: 100%; padding: 15px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: #fff; text-align: center; font-size: 20px; letter-spacing: 5px; margin: 20px 0; outline: none; }
-  
-  /* APP INTERNO */
-  #app { display: none; flex-direction: column; height: 100%; opacity: 0; transition: 0.5s; }
-  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg2); }
-  .logo { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--accent); }
+  /* AUTH & LOCK */
+  #lock-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+  .pass-field { width: 100%; max-width: 280px; background: var(--surface); border: 1px solid var(--border); padding: 15px; border-radius: 12px; color: #fff; font-size: 20px; text-align: center; letter-spacing: 4px; outline: none; margin: 20px 0; }
 
-  .main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+  /* APP LAYOUT */
+  #app { display: none; flex-direction: column; height: 100%; }
+  .navbar { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: var(--bg2); border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'Syne', sans-serif; color: var(--accent); font-size: 20px; }
   
-  /* ESTILO DE EDIÇÃO DIRETA */
-  .card-edit { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 20px; }
-  .edit-title { background: none; border: none; color: var(--accent); font-weight: 700; font-size: 16px; width: 100%; margin-bottom: 10px; outline: none; }
-  .edit-body { background: none; border: none; color: var(--text); font-size: 14px; width: 100%; resize: none; outline: none; line-height: 1.5; min-height: 60px; }
-  .edit-meta { display: flex; gap: 10px; margin-top: 15px; align-items: center; border-top: 1px solid var(--border); padding-top: 10px; }
+  .tools { display: flex; gap: 10px; padding: 10px 20px; background: var(--bg2); overflow-x: auto; border-bottom: 1px solid var(--border); }
+  .tool-btn { padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); font-size: 11px; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+
+  .main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; }
   
-  .badge { background: var(--bg); border: 1px solid var(--border); padding: 5px 10px; border-radius: 6px; font-size: 11px; color: #8892AA; display: flex; align-items: center; gap: 5px; }
-  .img-preview { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid var(--border); }
+  /* CARDS & EDITOR */
+  .card-pro { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 15px; transition: 0.3s; }
+  .card-pro:focus-within { border-color: var(--accent); box-shadow: 0 0 15px rgba(79,142,247,0.1); }
+  .inp-t { background: none; border: none; color: var(--accent); font-weight: 800; width: 100%; outline: none; font-size: 16px; margin-bottom: 8px; }
+  .inp-b { background: none; border: none; color: var(--text); width: 100%; outline: none; font-size: 14px; resize: none; line-height: 1.6; }
+  
+  .wa-tag { background: #075E54; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-bottom: 10px; display: inline-block; }
 
-  .search-box { padding: 10px 20px; display: flex; gap: 10px; }
-  .search-input { flex: 1; background: var(--surface); border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: #fff; outline: none; }
-
-  .btn-float { position: fixed; bottom: 30px; right: 20px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: none; z-index: 99; }
+  .btn-add { position: fixed; bottom: 30px; right: 25px; width: 64px; height: 64px; background: var(--accent); border-radius: 20px; border: none; color: #fff; font-size: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.5); z-index: 100; }
+  
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
 <div id="lock-screen">
-  <div class="lock-box">
-    <i class="ph ph-fingerprint" style="font-size: 60px; color: var(--accent);"></i>
-    <h2 style="margin-top: 15px; font-family: 'Syne';">NEXUS SECURE</h2>
-    <p style="font-size: 12px; color: #555; margin-top: 5px;">Acesso restrito a Edson Rangel</p>
-    <input type="password" id="masterPass" class="pass-input" placeholder="••••••••" oninput="checkPass(this.value)">
-    <button onclick="tryBiometrics()" style="background:none; border:none; color:var(--accent); font-size:13px; font-weight:bold; cursor:pointer">Usar Biometria</button>
+  <div>
+    <i class="ph ph-fingerprint" style="font-size: 64px; color: var(--accent)"></i>
+    <h2 style="font-family: 'Syne'; margin-top: 15px">NEXUS CORE</h2>
+    <input type="password" id="mPass" class="pass-field" placeholder="••••••••" oninput="verify(this.value)">
+    <div id="biometric-trigger" onclick="handleBio()" style="color: var(--text2); font-size: 13px; cursor: pointer">Tocar para biometria</div>
   </div>
 </div>
 
 <div id="app">
-  <header class="topbar">
-    <div class="logo">NEXUS PRO</div>
+  <nav class="navbar">
+    <span class="logo">NEXUS CORE V2</span>
     <div style="display:flex; gap:15px">
-      <i class="ph ph-shield-check" style="color:#1EDCA5"></i>
-      <i class="ph ph-power" onclick="location.reload()" style="color:var(--danger)"></i>
+      <i class="ph ph-arrow-counter-clockwise" onclick="restoreAuto()" title="Restaurar Dados" style="color:var(--accent)"></i>
+      <i class="ph ph-gear" onclick="toggleSettings()"></i>
     </div>
-  </header>
+  </nav>
 
-  <div class="search-box">
-    <input type="text" id="q" class="search-input" placeholder="Pesquisa profunda..." onkeyup="render()">
+  <div class="tools">
+    <div class="tool-btn" onclick="exportJSON()"><i class="ph ph-export"></i> Backup JSON</div>
+    <label class="tool-btn"><i class="ph ph-whatsapp-logo"></i> Importar WhatsApp <input type="file" id="waIn" hidden onchange="importWA(this)"></label>
+    <div class="tool-btn" onclick="document.getElementById('q').focus()"><i class="ph ph-magnifying-glass"></i> Busca</div>
+  </div>
+
+  <div style="padding: 10px 20px">
+    <input type="text" id="q" style="width:100%; padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:#fff" placeholder="Buscar em conversas ou notas..." onkeyup="render()">
   </div>
 
   <main class="main" id="list"></main>
-  
-  <button class="btn-float" onclick="addNew()"><i class="ph ph-plus"></i></button>
+  <button class="btn-add" onclick="create()"><i class="ph ph-plus"></i></button>
 </div>
 
 <script>
-  // Configurações de Segurança
-  const MASTER_HASH = "33631050"; 
-  const DB_KEY = "nexus_pro_v1";
-  let db = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+  // SISTEMA DE PERSISTÊNCIA E VERSIONAMENTO
+  const SYS_VER = "2.0";
+  const DB_NAME = "NEXUS_DB_PERSISTENT";
+  const BK_NAME = "NEXUS_AUTO_BACKUP";
+  const MASTER = "33631050";
 
-  // 1. Controle de Acesso
-  function checkPass(val) {
-    if(val === MASTER_HASH) {
-      unlockApp();
+  let db = [];
+
+  // Inicialização com Proteção de Dados
+  (function init() {
+    const saved = localStorage.getItem(DB_NAME);
+    const backup = localStorage.getItem(BK_NAME);
+
+    if (saved) {
+      db = JSON.parse(saved);
+      // Criar backup automático a cada sessão estável
+      localStorage.setItem(BK_NAME, saved);
+    } else if (backup) {
+      // Se detectar perda de dados (saved vazio mas backup existe)
+      if(confirm("Perda de dados detectada. Restaurar backup automático?")) {
+        db = JSON.parse(backup);
+        save();
+      }
+    }
+  })();
+
+  function verify(v) { if(v === MASTER) unlock(); }
+
+  async function handleBio() {
+    // API Nativa BiometricPrompt simulada para WebAuthn
+    if (window.confirm("Simular autenticação biométrica do Android?")) {
+      unlock();
     }
   }
 
-  async function tryBiometrics() {
-    if (window.PublicKeyCredential) {
-      // Simulação de chamada biométrica nativa (BiometricPrompt via WebAuthn)
-      // Em um PWA real, isso acionaria o sensor do Android
-      alert("Aguardando impressão digital...");
-      // Nota: Para produção real, usaríamos navigator.credentials.get()
-      // Fallback para facilitar seu teste agora:
-      const p = prompt("Falha na biometria. Digite a Senha Master:");
-      if(p === MASTER_HASH) unlockApp();
-    } else {
-      alert("Biometria não suportada neste navegador. Use a senha.");
-    }
+  function unlock() {
+    document.getElementById('lock-screen').classList.add('hidden');
+    document.getElementById('app').style.display = 'flex';
+    render();
   }
 
-  function unlockApp() {
-    document.getElementById('lock-screen').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('lock-screen').style.display = 'none';
-      const app = document.getElementById('app');
-      app.style.display = 'flex';
-      setTimeout(() => app.style.opacity = '1', 50);
+  // PARSER DE WHATSAPP (.txt exportado)
+  function importWA(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const text = e.target.result;
+      const lines = text.split('\n');
+      let count = 0;
+
+      lines.forEach(line => {
+        // Regex para capturar: [data hora] Nome: Mensagem
+        const match = line.match(/(\d{2}\/\d{2}\/\d{4}) (\d{2}:\d{2}) - (.*?): (.*)/);
+        if (match) {
+          db.push({
+            id: Date.now() + count,
+            t: `Conversa: ${match[3]}`,
+            b: match[4],
+            date: match[1],
+            time: match[2],
+            source: 'whatsapp',
+            cat: 'Importado'
+          });
+          count++;
+        }
+      });
+      save();
       render();
-    }, 500);
+      alert(count + " mensagens importadas com sucesso!");
+    };
+    reader.readAsText(file);
   }
 
-  // 2. Edição Direta e Salvamento Automático
+  // FUNÇÕES DE CONTROLE
+  function save() {
+    localStorage.setItem(DB_NAME, JSON.stringify(db));
+    // Backup de segurança redundante
+    localStorage.setItem(BK_NAME, JSON.stringify(db));
+  }
+
   function render() {
     const q = document.getElementById('q').value.toLowerCase();
-    const list = document.getElementById('list');
-    list.innerHTML = '';
+    const container = document.getElementById('list');
+    container.innerHTML = '';
 
-    db.filter(m => m.t.toLowerCase().includes(q) || m.b.toLowerCase().includes(q)).reverse().forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'card-edit';
-      card.innerHTML = `
-        <input type="text" class="edit-title" value="${m.t}" oninput="update(${m.id}, 't', this.value)" placeholder="Título">
-        <textarea class="edit-body" oninput="update(${m.id}, 'b', this.value)" placeholder="Conteúdo...">${m.b}</textarea>
-        
-        ${m.f ? (m.isI ? `<img src="${m.f}" class="img-preview">` : `<div class="badge"><i class="ph ph-file"></i> ${m.fn}</div>`) : ''}
-        
-        <div class="edit-meta">
-          <div class="badge"><i class="ph ph-calendar"></i> ${m.date}</div>
-          <div class="badge" onclick="removeFile(${m.id})" style="color:var(--danger)">Remover anexo</div>
-          <div style="flex:1; text-align:right">
-            <i class="ph ph-trash" onclick="del(${m.id})" style="color:var(--danger); font-size:18px"></i>
-          </div>
+    db.filter(m => 
+      m.t.toLowerCase().includes(q) || 
+      m.b.toLowerCase().includes(q) ||
+      (m.date && m.date.includes(q))
+    ).reverse().forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'card-pro';
+      div.innerHTML = `
+        ${m.source === 'whatsapp' ? `<span class="wa-tag">WhatsApp</span>` : ''}
+        <input type="text" class="inp-t" value="${m.t}" oninput="upd(${m.id}, 't', this.value)">
+        <textarea class="inp-b" oninput="upd(${m.id}, 'b', this.value)" rows="${m.b.length > 50 ? 4 : 2}">${m.b}</textarea>
+        <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:10px; color:var(--text2)">
+          <span>${m.date || ''} ${m.time || ''}</span>
+          <i class="ph ph-trash" onclick="del(${m.id})" style="color:var(--danger)"></i>
         </div>
       `;
-      list.appendChild(card);
+      container.appendChild(div);
     });
   }
 
-  function update(id, field, value) {
-    const item = db.find(x => x.id === id);
-    if(item) {
-      item[field] = value;
-      item.lastEdit = new Date().toISOString();
-      saveDB();
-      // O salvamento automático acontece aqui a cada tecla
-    }
+  function upd(id, f, v) {
+    const i = db.find(x => x.id === id);
+    if(i) { i[f] = v; save(); }
   }
 
-  function addNew() {
-    const now = new Date();
-    const newItem = {
-      id: Date.now(),
-      t: "",
-      b: "",
-      f: null,
-      fn: null,
-      isI: false,
-      date: now.toLocaleDateString(),
-      lastEdit: now.toISOString()
-    };
-    db.push(newItem);
-    saveDB();
+  function create() {
+    db.push({ id: Date.now(), t: "", b: "", date: new Date().toLocaleDateString(), source: 'manual' });
+    save();
     render();
-    // Foca no primeiro título da lista (o novo)
-    setTimeout(() => document.querySelector('.edit-title').focus(), 100);
   }
 
   function del(id) {
-    if(confirm("Excluir permanentemente?")) {
+    if(confirm("Excluir dado permanentemente?")) {
       db = db.filter(x => x.id !== id);
-      saveDB();
+      save();
       render();
     }
   }
 
-  function removeFile(id) {
-    const item = db.find(x => x.id === id);
-    if(item) { item.f = null; item.fn = null; saveDB(); render(); }
+  function exportJSON() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `nexus_backup_${Date.now()}.json`);
+    dlAnchorElem.click();
   }
 
-  function saveDB() {
-    localStorage.setItem(DB_KEY, JSON.stringify(db));
+  function restoreAuto() {
+    const backup = localStorage.getItem(BK_NAME);
+    if(backup) {
+      db = JSON.parse(backup);
+      save();
+      render();
+      alert("Sistema restaurado do último backup automático.");
+    }
   }
-
-  // Bloqueio automático ao sair (opcional)
-  window.onblur = () => {
-    // console.log("Nexus Protegido");
-  };
-
 </script>
 </body>
 </html>
